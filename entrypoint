@@ -1,0 +1,33 @@
+#!/bin/bash
+
+copy_if_empty() {
+    SRC=$1
+    DEST=$2
+    DEFAULT_SRC=$3
+
+    if [ ! -d "$DEST" ]; then
+        echo "$DEST does not exist, creating directory..."
+        mkdir -p "$DEST"
+    fi
+
+    if [ ! "$(ls -A "$DEST" 2>/dev/null)" ]; then
+        echo "$DEST is empty, copying default data..."
+        cp -a "$DEFAULT_SRC"/* "$DEST"
+    else
+        echo "$DEST already contains data, skipping copy."
+    fi
+}
+
+./upsMonitor start &
+
+echo "Waiting for ViewPower to initialize directories..."
+while [ ! -d "/opt/ViewPower/datas" ] || [ ! -d "/opt/ViewPower/datalog" ] || [ ! -d "/opt/ViewPower/log" ]; do
+    sleep 1
+done
+
+copy_if_empty "/opt/ViewPower/config" "/opt/ViewPower/config" "/opt/ViewPower/default_data/config"
+copy_if_empty "/opt/ViewPower/datas" "/opt/ViewPower/datas" "/opt/ViewPower/default_data/datas"
+copy_if_empty "/opt/ViewPower/datalog" "/opt/ViewPower/datalog" "/opt/ViewPower/default_data/datalog"
+copy_if_empty "/opt/ViewPower/log" "/opt/ViewPower/log" "/opt/ViewPower/default_data/log"
+
+tail -f /opt/ViewPower/log/testlog/*

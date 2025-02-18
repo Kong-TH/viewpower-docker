@@ -1,0 +1,20 @@
+services:
+  viewpower:
+    build: .
+    ports:
+      - "15178:15178"
+      - "8005:8005"
+    volumes:
+      - /media/storage-one/viewpowerpro/config:/opt/ViewPower/config
+      - /media/storage-one/viewpowerpro/datas:/opt/ViewPower/datas
+      - /media/storage-one/viewpowerpro/datalog:/opt/ViewPower/datalog
+      - /media/storage-one/viewpowerpro/log:/opt/ViewPower/log
+      - /dev/bus/usb:/dev/bus/usb
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:15178"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    privileged: true
+    restart: unless-stopped
