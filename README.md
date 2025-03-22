@@ -71,7 +71,7 @@ docker-compose up -d
 ## Source Code
 [📂 ViewPower Docker GitLab Repository](https://git.kohtnas.com/publicgroup/viewpower-docker)
 ```bash
-   git clone http://kongnet.3bbddns.com:52733/publicgroup/viewpower-docker.git
+   git clone http://cloud.kohtnas.com:52733/publicgroup/viewpower-docker.git
 ```
 ## Credit
 This Dockerfile is based on the original work from **[Michuu/viewpower-docker](https://github.com/Michuu/viewpower-docker)**, with modifications and improvements for better health checking and performance.
