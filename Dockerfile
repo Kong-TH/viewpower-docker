@@ -23,7 +23,7 @@ RUN echo "o\n/opt/ViewPower\nn\nn\n" | ./ViewPower_linux_x64_text.sh
 RUN rm ViewPower_linux_x64_text.sh
 
 WORKDIR /opt/ViewPower
-RUN ./upsMonitor start && sleep 10 && ./upsMonitor stop
+RUN ./upsMonitor start && sleep 60 && ./upsMonitor stop
 
 RUN mkdir -p /opt/ViewPower/default_data
 RUN cp -a /opt/ViewPower/config /opt/ViewPower/default_data/config
