@@ -15,9 +15,9 @@
 
 ## Screenshot
 
-![01](https://git.kohtnas.com/publicgroup/viewpower-docker/-/raw/main/images/ViewPower-01.png?ref_type=heads)
-![02](https://git.kohtnas.com/publicgroup/viewpower-docker/-/raw/main/images/ViewPower-02.png?ref_type=heads)
-![03](https://git.kohtnas.com/publicgroup/viewpower-docker/-/raw/main/images/ViewPower-03.png?ref_type=heads)
+![01](https://github.com/Kong-TH/viewpower-docker/blob/main/images/ViewPower-01.png?raw=true?ref_type=heads)
+![02](https://github.com/Kong-TH/viewpower-docker/blob/main/images/ViewPower-02.png?ref_type=heads)
+![03](https://github.com/Kong-TH/viewpower-docker/blob/main/images/ViewPower-03.png?raw=true?ref_type=heads)
 
 ## Ports
 - `15178` – Web service port
