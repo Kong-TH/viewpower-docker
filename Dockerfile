@@ -1,4 +1,4 @@
-#New update for ViewPower Pro Version 2.0-22165
+#New update for ViewPower Version 1.04-25210
 FROM debian:bookworm-slim as builder
 
 RUN apt update
