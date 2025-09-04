@@ -15,9 +15,9 @@
 
 ## Screenshot
 
-![01](https://github.com/Kong-TH/viewpower-docker/blob/main/images/ViewPower-01.png?raw=true?ref_type=heads)
-![02](https://github.com/Kong-TH/viewpower-docker/blob/main/images/ViewPower-02.png?ref_type=heads)
-![03](https://github.com/Kong-TH/viewpower-docker/blob/main/images/ViewPower-03.png?raw=true?ref_type=heads)
+![01](https://git.kohtnas.com/publicgroup/viewpower-docker/-/raw/main/images/ViewPower-01.png?ref_type=heads)
+![02](https://git.kohtnas.com/publicgroup/viewpower-docker/-/raw/main/images/ViewPower-02.png?ref_type=heads)
+![03](https://git.kohtnas.com/publicgroup/viewpower-docker/-/raw/main/images/ViewPower-03.png?ref_type=heads)
 
 ## Ports
 - `15178` – Web service port
@@ -69,9 +69,9 @@ docker-compose up -d
 ```
 
 ## Source Code
-[📂 ViewPower Docker GitLab Repository](https://github.com/Kong-TH/viewpower-docker)
+[📂 ViewPower Docker GitLab Repository](https://git.kohtnas.com/publicgroup/viewpower-docker)
 ```bash
-   git clone https://github.com/Kong-TH/viewpower-docker.git
+   git clone http://cloud.kohtnas.com:52733/publicgroup/viewpower-docker.git
 ```
 ## Credit
 This Dockerfile is based on the original work from **[Michuu/viewpower-docker](https://github.com/Michuu/viewpower-docker)**, with modifications and improvements for better health checking and performance.
