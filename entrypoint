@@ -30,4 +30,4 @@ copy_if_empty "/opt/ViewPower/datas" "/opt/ViewPower/datas" "/opt/ViewPower/defa
 copy_if_empty "/opt/ViewPower/datalog" "/opt/ViewPower/datalog" "/opt/ViewPower/default_data/datalog"
 copy_if_empty "/opt/ViewPower/log" "/opt/ViewPower/log" "/opt/ViewPower/default_data/log"
 
-tail -f /opt/ViewPower/log/testlog/*
+tail -F /opt/ViewPower/log/testlog/* 2>/dev/null || true
