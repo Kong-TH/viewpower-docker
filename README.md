@@ -3,6 +3,9 @@
 ## Overview
 **ViewPowerHTML 1.04-21344** is an advanced UPS management software. It allows remote monitoring and management of multiple UPS devices over a **LAN or INTERNET** connection. It prevents data loss during power outages, enables safe system shutdown, and provides scheduling and analysis features.
 
+## Access
+After successful installation, access the ViewPower web interface at: http://YOUR_SERVER_IP:15178/ViewPower/
+
 ## Features
 - Monitor and control **multiple UPS devices** over LAN/Internet
 - Supports **auto/manual online updates**
