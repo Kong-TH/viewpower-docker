@@ -18,9 +18,9 @@ After successful installation, access the ViewPower web interface at: http://YOU
 
 ## Screenshot
 
-![01](https://github.com/Kong-TH/viewpower-docker/blob/main/images/ViewPower-01.png)
-![02](https://github.com/Kong-TH/viewpower-docker/blob/main/images/ViewPower-02.png)
-![03](https://github.com/Kong-TH/viewpower-docker/blob/main/images/ViewPower-03.png)
+![01](https://raw.githubusercontent.com/Kong-TH/viewpower-docker/refs/heads/main/images/ViewPower-01.png)
+![02](https://raw.githubusercontent.com/Kong-TH/viewpower-docker/refs/heads/main/images/ViewPower-02.png)
+![03](https://raw.githubusercontent.com/Kong-TH/viewpower-docker/refs/heads/main/images/ViewPower-03.png)
 
 ## Ports
 - `15178` – Web service port
