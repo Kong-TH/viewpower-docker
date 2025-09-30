@@ -58,7 +58,10 @@ RUN git clone --recursive https://github.com/FEX-Emu/FEX.git /tmp/fex \
     && git fetch --all \
     && git checkout FEX-2509_1 \
     && git submodule update --init --recursive \
-    && cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DFEX_OPTION_DISABLE_ALL_QT_DEPENDENCIES=ON . \
+    && cmake -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DFEX_OPTION_DISABLE_ALL_QT_DEPENDENCIES=ON \
+        -DFEX_BUILD_TOOLS=OFF . \
     && cmake --build build \
     && cmake --install build --prefix /usr/local \
     && rm -rf /tmp/fex \
@@ -67,15 +70,12 @@ RUN git clone --recursive https://github.com/FEX-Emu/FEX.git /tmp/fex \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Install runtime dependencies
+# Install runtime dependencies (no Qt needed)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     sudo \
     curl \
     python3 \
     libgl1-mesa-dev \
-    libqt5core5a \
-    libqt5gui5 \
-    libqt5widgets5 \
     libfuse2 \
     && rm -rf /var/lib/apt/lists/*
 
