@@ -45,7 +45,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libfuse-dev \
     && update-ca-certificates \
     && update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 100 \
-    && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-16 100
+    && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-16 100 \
+    && update-alternatives --set clang /usr/bin/clang-16 \
+    && update-alternatives --set clang++ /usr/bin/clang++-16
+
+# Build FEX-Emu from source
+ENV CC=/usr/bin/clang-16
+ENV CXX=/usr/bin/clang++-16
 
 # Build FEX-Emu from source
 RUN git clone https://github.com/FEX-Emu/FEX.git /tmp/fex \
