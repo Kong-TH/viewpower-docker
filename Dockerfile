@@ -25,13 +25,50 @@ RUN rm ViewPower_linux_x64_text.tar.gz
 # ===========================
 FROM debian:bookworm-slim as runtime
 
-RUN apt-get update && apt-get install -y git cmake build-essential clang lld ninja-build python3 pkg-config libgl1-mesa-dev libqt5core5a libqt5gui5 libqt5widgets5 libfuse2 libfuse-dev && rm -rf /var/lib/apt/lists/*
+# Install build dependencies for FEX-Emu
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    cmake \
+    build-essential \
+    clang-16 \
+    lld-16 \
+    ninja-build \
+    python3 \
+    pkg-config \
+    wget \
+    libgl1-mesa-dev \
+    libqt5core5a \
+    libqt5gui5 \
+    libqt5widgets5 \
+    libfuse2 \
+    libfuse-dev \
+    && update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 100 \
+    && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-16 100
 
-RUN git clone --branch FEX-2509.1 https://github.com/FEX-Emu/FEX.git /tmp/fex
-WORKDIR /tmp/fex
-RUN mkdir build && cd build && cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release && ninja
-RUN cp build/FEX /usr/local/bin/fex
+# Build FEX-Emu from source
+RUN git clone --branch FEX-2509.1 https://github.com/FEX-Emu/FEX.git /tmp/fex \
+    && cd /tmp/fex \
+    && cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release .. \
+    && cmake --build build \
+    && cp build/FEX /usr/local/bin/fex \
+    && rm -rf /tmp/fex \
+    && apt-get purge -y git cmake build-essential clang-16 lld-16 ninja-build python3 pkg-config \
+    && apt-get autoremove -y \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    sudo \
+    curl \
+    libgl1-mesa-dev \
+    libqt5core5a \
+    libqt5gui5 \
+    libqt5widgets5 \
+    libfuse2 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install ViewPower
 RUN mkdir /install
 WORKDIR /install
 COPY --from=builder /build/ViewPower_linux_x64_text.sh /install/ViewPower_linux_x64_text.sh
