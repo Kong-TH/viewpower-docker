@@ -46,9 +46,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && update-alternatives --set clang /usr/bin/clang-16 \
     && update-alternatives --set clang++ /usr/bin/clang++-16
 
-# Install Python packaging module
-RUN pip3 install --no-cache-dir packaging --break-system-packages
-
 # Build FEX-Emu from source
 ENV CC=/usr/bin/clang-16
 ENV CXX=/usr/bin/clang++-16
@@ -58,19 +55,20 @@ RUN git clone --recursive https://github.com/FEX-Emu/FEX.git /tmp/fex \
     && git fetch --all \
     && git checkout FEX-2509_1 \
     && git submodule update --init --recursive \
+    && sed -i '/add_subdirectory(Source\/Tools)/d' CMakeLists.txt \
+    && sed -i '/add_subdirectory(Tools)/d' CMakeLists.txt \
+    && find Source/Tools -type f -name 'CMakeLists.txt' -exec sed -i 's/find_package(Qt5.*)//g' {} \; \
     && cmake -B build -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
         -DFEX_CORE=ON \
-        -DFEX_LINUX_TESTS=OFF \
-        -DFEX_ENABLE_ASSERTIONS=OFF \
         -DFEX_BUILD_TESTS=OFF \
         -DFEX_BUILD_TOOLS=OFF \
-        -DFEX_OPTION_ENABLE_GUI=OFF \
-        -DFEX_OPTION_USE_QT=OFF . \
+        -DFEX_OPTION_USE_QT=OFF \
+        -DFEX_OPTION_ENABLE_GUI=OFF . \
     && cmake --build build \
     && cmake --install build --prefix /usr/local \
     && rm -rf /tmp/fex \
-    && apt-get purge -y git cmake build-essential clang-16 lld-16 ninja-build python3-pip pkg-config \
+    && apt-get purge -y git cmake build-essential clang-16 lld-16 ninja-build pkg-config \
     && apt-get autoremove -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -79,7 +77,6 @@ RUN git clone --recursive https://github.com/FEX-Emu/FEX.git /tmp/fex \
 RUN apt-get update && apt-get install -y --no-install-recommends \
     sudo \
     curl \
-    python3 \
     libgl1-mesa-dev \
     libfuse2 \
     && rm -rf /var/lib/apt/lists/*
