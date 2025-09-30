@@ -9,8 +9,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     sudo \
     curl \
-    zlib1g \
     wget \
+    zlib1g \
+    tar \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /build
@@ -20,21 +21,31 @@ RUN tar -xvzf ViewPower_linux_x64_text.tar.gz
 RUN rm ViewPower_linux_x64_text.tar.gz
 
 # ===========================
-# Runtime Stage
+# Runtime Stage (ARM64)
 # ===========================
 FROM debian:bookworm-slim as runtime
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    sudo \
+    curl \
+    libusb-1.0-0 \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN wget -O /tmp/fex.deb https://launchpad.net/~fex-emu/+archive/ubuntu/fex/+build/31290640/+files/fex-emu-armv8.2_2509.1~q_arm64.deb \
+    && apt-get install -y /tmp/fex.deb \
+    && rm /tmp/fex.deb
 
 RUN mkdir /install
 WORKDIR /install
 COPY --from=builder /build/ViewPower_linux_x64_text.sh /install/ViewPower_linux_x64_text.sh
 
-RUN apt update && apt install -y sudo lib32z1 curl && rm -rf /var/lib/apt/lists/*
-
 RUN echo "o\n/opt/ViewPower\nn\nn\n" | ./ViewPower_linux_x64_text.sh
 RUN rm ViewPower_linux_x64_text.sh
 
 WORKDIR /opt/ViewPower
-RUN ./upsMonitor start && sleep 60 && ./upsMonitor stop
+RUN ./fex ./upsMonitor start && sleep 60 && ./fex ./upsMonitor stop
 
 RUN mkdir -p /opt/ViewPower/default_data && \
     cp -a /opt/ViewPower/config /opt/ViewPower/default_data/config && \
