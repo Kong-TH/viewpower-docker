@@ -34,6 +34,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     clang-16 \
     lld-16 \
     ninja-build \
+    python3 \
+    python3-pip \
     nasm \
     pkg-config \
     wget \
