@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     sudo \
     curl \
     zlib1g \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /build
