@@ -5,7 +5,11 @@
 # ===========================
 FROM debian:bookworm-slim as builder
 
-RUN apt update && apt install -y wget && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    sudo \
+    curl \
+    zlib1g \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /build
 WORKDIR /build
