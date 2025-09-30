@@ -27,6 +27,7 @@ FROM debian:bookworm-slim as runtime
 
 # Install build dependencies for FEX-Emu
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
     git \
     cmake \
     build-essential \
@@ -42,6 +43,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libqt5widgets5 \
     libfuse2 \
     libfuse-dev \
+    && update-ca-certificates \
     && update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 100 \
     && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-16 100
 
