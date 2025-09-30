@@ -6,6 +6,7 @@
 FROM debian:bookworm-slim as builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
     sudo \
     curl \
     zlib1g \
