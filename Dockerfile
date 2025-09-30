@@ -58,7 +58,7 @@ RUN git clone --recursive https://github.com/FEX-Emu/FEX.git /tmp/fex \
     && git fetch --all \
     && git checkout FEX-2509_1 \
     && git submodule update --init --recursive \
-    && cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DFEX_OPTION_DISABLE_QT_TOOLS=ON . \
+    && cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DFEX_OPTION_DISABLE_ALL_QT_DEPENDENCIES=ON . \
     && cmake --build build \
     && cmake --install build --prefix /usr/local \
     && rm -rf /tmp/fex \
