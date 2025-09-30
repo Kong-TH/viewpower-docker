@@ -25,17 +25,12 @@ RUN rm ViewPower_linux_x64_text.tar.gz
 # ===========================
 FROM debian:bookworm-slim as runtime
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    sudo \
-    curl \
-    libusb-1.0-0 \
-    wget \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y git cmake build-essential clang lld ninja-build python3 pkg-config libgl1-mesa-dev libqt5core5a libqt5gui5 libqt5widgets5 libfuse2 libfuse-dev && rm -rf /var/lib/apt/lists/*
 
-RUN wget -O /tmp/fex.deb https://launchpad.net/~fex-emu/+archive/ubuntu/fex/+build/31290640/+files/fex-emu-armv8.2_2509.1~q_arm64.deb \
-    && apt-get install -y /tmp/fex.deb \
-    && rm /tmp/fex.deb
+RUN git clone --branch FEX-2509.1 https://github.com/FEX-Emu/FEX.git /tmp/fex
+WORKDIR /tmp/fex
+RUN mkdir build && cd build && cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release && ninja
+RUN cp build/FEX /usr/local/bin/fex
 
 RUN mkdir /install
 WORKDIR /install
