@@ -39,11 +39,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pkg-config \
     wget \
     libgl1-mesa-dev \
-    libqt5core5a \
-    libqt5gui5 \
-    libqt5widgets5 \
     libfuse2 \
-    libfuse-dev \
     && update-ca-certificates \
     && update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 100 \
     && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-16 100 \
@@ -62,7 +58,7 @@ RUN git clone --recursive https://github.com/FEX-Emu/FEX.git /tmp/fex \
     && git fetch --all \
     && git checkout FEX-2509_1 \
     && git submodule update --init --recursive \
-    && cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release . \
+    && cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DFEX_OPTION_DISABLE_QT_TOOLS=ON . \
     && cmake --build build \
     && cmake --install build --prefix /usr/local \
     && rm -rf /tmp/fex \
