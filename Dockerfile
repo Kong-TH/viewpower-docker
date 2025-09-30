@@ -48,9 +48,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-16 100
 
 # Build FEX-Emu from source
-RUN git clone --branch FEX-2509.1 https://github.com/FEX-Emu/FEX.git /tmp/fex \
+RUN git clone https://github.com/FEX-Emu/FEX.git /tmp/fex \
     && cd /tmp/fex \
-    && cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release .. \
+    && git fetch --all \
+    && git checkout FEX-2509_1 \
+    && cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release . \
     && cmake --build build \
     && cp build/FEX /usr/local/bin/fex \
     && rm -rf /tmp/fex \
