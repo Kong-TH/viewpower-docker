@@ -60,8 +60,13 @@ RUN git clone --recursive https://github.com/FEX-Emu/FEX.git /tmp/fex \
     && git submodule update --init --recursive \
     && cmake -B build -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
-        -DFEX_OPTION_DISABLE_ALL_QT_DEPENDENCIES=ON \
-        -DFEX_BUILD_TOOLS=OFF . \
+        -DFEX_CORE=ON \
+        -DFEX_LINUX_TESTS=OFF \
+        -DFEX_ENABLE_ASSERTIONS=OFF \
+        -DFEX_BUILD_TESTS=OFF \
+        -DFEX_BUILD_TOOLS=OFF \
+        -DFEX_OPTION_ENABLE_GUI=OFF \
+        -DFEX_OPTION_USE_QT=OFF . \
     && cmake --build build \
     && cmake --install build --prefix /usr/local \
     && rm -rf /tmp/fex \
