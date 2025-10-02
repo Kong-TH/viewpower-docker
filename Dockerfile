@@ -56,6 +56,7 @@ RUN git clone --recursive https://github.com/FEX-Emu/FEX.git /tmp/fex \
     && git fetch --all \
     && git checkout FEX-2509_1 \
     && git submodule update --init --recursive \
+    && sed -i '/add_subdirectory( *Tools *)/d' Source/CMakeLists.txt \
     && cmake -B build -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
         -DFEX_CORE=ON \
