@@ -56,9 +56,6 @@ RUN git clone --recursive https://github.com/FEX-Emu/FEX.git /tmp/fex \
     && git fetch --all \
     && git checkout FEX-2509_1 \
     && git submodule update --init --recursive \
-    && rm -rf Source/Tools \
-    && sed -i '/add_subdirectory(Source\/Tools)/d' CMakeLists.txt \
-    && sed -i '/add_subdirectory(Tools)/d' CMakeLists.txt \
     && cmake -B build -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
         -DFEX_CORE=ON \
@@ -68,11 +65,7 @@ RUN git clone --recursive https://github.com/FEX-Emu/FEX.git /tmp/fex \
         -DFEX_OPTION_ENABLE_GUI=OFF . \
     && cmake --build build \
     && cmake --install build --prefix /usr/local \
-    && rm -rf /tmp/fex \
-    && apt-get purge -y git cmake build-essential clang-16 lld-16 ninja-build pkg-config \
-    && apt-get autoremove -y \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /tmp/fex
 
 # Install runtime dependencies (no Qt needed)
 RUN apt-get update && apt-get install -y --no-install-recommends \
