@@ -10,7 +10,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     sudo \
     curl \
     wget \
-    zlib1g \
     tar \
     && rm -rf /var/lib/apt/lists/*
 
@@ -29,6 +28,7 @@ FROM debian:bookworm-slim as runtime
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     git \
+    binutils \
     cmake \
     build-essential \
     clang-16 \
@@ -92,6 +92,9 @@ RUN mkdir -p /opt/ViewPower/default_data && \
     cp -a /opt/ViewPower/datas /opt/ViewPower/default_data/datas && \
     cp -a /opt/ViewPower/datalog /opt/ViewPower/default_data/datalog && \
     cp -a /opt/ViewPower/log /opt/ViewPower/default_data/log
+
+# Clear uselass packages
+RUN apt-get purge -y build-essential clang-16 lld-16 cmake ninja-build git
 
 # ===========================
 # Add shutdown script
