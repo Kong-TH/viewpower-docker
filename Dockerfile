@@ -22,29 +22,22 @@ RUN rm ViewPower_linux_x64_text.tar.gz
 # ===========================
 FROM ubuntu:latest
 
-# Install FEX-Emu (จาก PPA) + runtime deps
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    sudo \
-    curl \
-    libgl1-mesa-dev \
-    libfuse2 \
-    squashfs-tools \
-    zenity \
-    software-properties-common \
+# Install FEX-Emu
+RUN apt-get update && apt-get install -y --no-install-recommends software-properties-common curl sudo libgl1-mesa-dev libfuse2 squashfs-tools zenity \
     && add-apt-repository -y ppa:fex-emu/fex \
     && apt-get update \
-    && apt-get install -y fex-emu \
+    && apt-get install -y fex-emu-armv8.4 \
     && rm -rf /var/lib/apt/lists/*
 
 # Add PATH
 ENV PATH="/usr/local/bin:${PATH}"
 
-# Copy ViewPower จาก builder
+# Copy ViewPower from builder
 RUN mkdir -p /install
 WORKDIR /install
 COPY --from=builder /build/ViewPower_linux_x64_text.sh /install/ViewPower_linux_x64_text.sh
 
-# Install ViewPower ผ่าน FEXBash
+# Install ViewPower with FEXBash
 RUN echo "o\n/opt/ViewPower\nn\nn\n" | FEXBash ./ViewPower_linux_x64_text.sh \
     && rm ViewPower_linux_x64_text.sh
 
