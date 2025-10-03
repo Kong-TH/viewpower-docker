@@ -50,6 +50,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Build FEX-Emu from source
 ENV CC=/usr/bin/clang-16
 ENV CXX=/usr/bin/clang++-16
+ENV AR=/usr/bin/llvm-ar-16
+ENV RANLIB=/usr/bin/llvm-ranlib-16
 
 RUN git clone --recursive https://github.com/FEX-Emu/FEX.git /tmp/fex \
     && cd /tmp/fex \
@@ -63,7 +65,9 @@ RUN git clone --recursive https://github.com/FEX-Emu/FEX.git /tmp/fex \
         -DFEX_BUILD_TESTS=OFF \
         -DFEX_BUILD_TOOLS=OFF \
         -DFEX_OPTION_USE_QT=OFF \
-        -DFEX_OPTION_ENABLE_GUI=OFF . \
+        -DFEX_OPTION_ENABLE_GUI=OFF \
+        -DCMAKE_AR=/usr/bin/llvm-ar-16 \
+        -DCMAKE_RANLIB=/usr/bin/llvm-ranlib-16 . \
     && cmake --build build \
     && cmake --install build --prefix /usr/local \
     && rm -rf /tmp/fex
