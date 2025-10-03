@@ -47,6 +47,7 @@ RUN git clone --recursive https://github.com/FEX-Emu/FEX.git /tmp/fex \
         -DCMAKE_RANLIB=/usr/bin/llvm-ranlib \
     && cmake --build build \
     && cmake --install build --prefix /usr/local \
+    && ln -s /usr/local/bin/FEX ./FEXBash \
     && rm -rf /tmp/fex
 
 # ===========================
