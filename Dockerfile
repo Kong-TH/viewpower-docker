@@ -46,7 +46,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 100 \
     && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-16 100 \
     && update-alternatives --set clang /usr/bin/clang-16 \
-    && update-alternatives --set clang++ /usr/bin/clang++-16
+    && update-alternatives --set clang++ /usr/bin/clang++-16 \
+    && ln -sf /usr/bin/llvm-ar-16 /usr/bin/llvm-ar \
+    && ln -sf /usr/bin/llvm-ranlib-16 /usr/bin/llvm-ranlib
 
 # Build FEX-Emu from source
 ENV CC=/usr/bin/clang-16 \
