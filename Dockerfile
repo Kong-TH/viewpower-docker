@@ -9,7 +9,9 @@ FROM ubuntu:latest AS builder
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     tar \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* 
+
+RUN apt-get update && apt-get install -y wget ca-certificates && rm -rf /var/lib/apt/lists/*
 
 # Download and extract ViewPower installer
 RUN mkdir /build
