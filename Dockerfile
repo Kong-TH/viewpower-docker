@@ -22,7 +22,7 @@ RUN rm ViewPower_linux_x64_text.tar.gz
 # ===========================
 # Runtime Stage (ARM64)
 # ===========================
-FROM fex-emu:latest as runtime
+FROM ggong5/fex-emu:latest as runtime
 
 # Install runtime dependencies (no Qt needed)
 RUN apt-get update && apt-get install -y --no-install-recommends \
