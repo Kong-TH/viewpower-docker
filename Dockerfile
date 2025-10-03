@@ -1,9 +1,7 @@
-# New update for ViewPower Version 1.04-25210-b1
-
 # ===========================
 # Build Stage
 # ===========================
-FROM debian:bookworm-slim as builder
+FROM ubuntu:latest AS builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -20,34 +18,44 @@ RUN tar -xvzf ViewPower_linux_x64_text.tar.gz
 RUN rm ViewPower_linux_x64_text.tar.gz
 
 # ===========================
-# Runtime Stage (ARM64)
+# Runtime Stage (Multi-Arch)
 # ===========================
-FROM ggong5/fex-emu:latest as runtime
+FROM ubuntu:latest
 
-# Install runtime dependencies (no Qt needed)
+# Install FEX-Emu (จาก PPA) + runtime deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
     sudo \
     curl \
     libgl1-mesa-dev \
     libfuse2 \
+    squashfs-tools \
+    zenity \
+    software-properties-common \
+    && add-apt-repository -y ppa:fex-emu/fex \
+    && apt-get update \
+    && apt-get install -y fex-emu \
     && rm -rf /var/lib/apt/lists/*
 
-# Install ViewPower
-RUN mkdir /install
+# Add PATH
+ENV PATH="/usr/local/bin:${PATH}"
+
+# Copy ViewPower จาก builder
+RUN mkdir -p /install
 WORKDIR /install
 COPY --from=builder /build/ViewPower_linux_x64_text.sh /install/ViewPower_linux_x64_text.sh
 
-RUN echo "o\n/opt/ViewPower\nn\nn\n" | FEXBash ./ViewPower_linux_x64_text.sh
-RUN rm ViewPower_linux_x64_text.sh
+# Install ViewPower ผ่าน FEXBash
+RUN echo "o\n/opt/ViewPower\nn\nn\n" | FEXBash ./ViewPower_linux_x64_text.sh \
+    && rm ViewPower_linux_x64_text.sh
 
+# Prepare default data
 WORKDIR /opt/ViewPower
 RUN FEXBash ./upsMonitor start && sleep 60 && FEXBash ./upsMonitor stop
-
-RUN mkdir -p /opt/ViewPower/default_data && \
-    cp -a /opt/ViewPower/config /opt/ViewPower/default_data/config && \
-    cp -a /opt/ViewPower/datas /opt/ViewPower/default_data/datas && \
-    cp -a /opt/ViewPower/datalog /opt/ViewPower/default_data/datalog && \
-    cp -a /opt/ViewPower/log /opt/ViewPower/default_data/log
+RUN mkdir -p /opt/ViewPower/default_data \
+    && cp -a /opt/ViewPower/config /opt/ViewPower/default_data/config \
+    && cp -a /opt/ViewPower/datas /opt/ViewPower/default_data/datas \
+    && cp -a /opt/ViewPower/datalog /opt/ViewPower/default_data/datalog \
+    && cp -a /opt/ViewPower/log /opt/ViewPower/default_data/log
 
 # ===========================
 # Add shutdown script
@@ -55,7 +63,6 @@ RUN mkdir -p /opt/ViewPower/default_data && \
 COPY ./shutdown.sh /usr/local/bin/shutdown.sh
 RUN chmod +x /usr/local/bin/shutdown.sh
 
-# Set volume for trigger file
 VOLUME ["/ups-events"]
 
 # ===========================
