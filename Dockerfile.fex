@@ -1,0 +1,72 @@
+# ===========================
+# Stage 1: Build FEX-Emu
+# ===========================
+FROM debian:bookworm-slim AS builder
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    git \
+    cmake \
+    build-essential \
+    clang-16 \
+    lld-16 \
+    llvm-16 \
+    ninja-build \
+    python3 \
+    python3-pip \
+    nasm \
+    pkg-config \
+    wget \
+    libgl1-mesa-dev \
+    libfuse2 \
+    && update-ca-certificates \
+    && update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 100 \
+    && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-16 100 \
+    && update-alternatives --set clang /usr/bin/clang-16 \
+    && update-alternatives --set clang++ /usr/bin/clang++-16 \
+    && ln -sf /usr/bin/llvm-ar-16 /usr/bin/llvm-ar \
+    && ln -sf /usr/bin/llvm-ranlib-16 /usr/bin/llvm-ranlib
+
+ENV CC=/usr/bin/clang-16 \
+    CXX=/usr/bin/clang++-16
+
+# Clone and build FEX
+RUN git clone --recursive https://github.com/FEX-Emu/FEX.git /tmp/fex \
+    && cd /tmp/fex \
+    && git checkout FEX-2509_1 \
+    && git submodule update --init --recursive \
+    && sed -i '/add_subdirectory.*Tools/d' Source/CMakeLists.txt \
+    && cmake -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DFEX_CORE=ON \
+        -DFEX_BUILD_TESTS=OFF \
+        -DFEX_BUILD_TOOLS=OFF \
+        -DFEX_OPTION_USE_QT=OFF \
+        -DFEX_OPTION_ENABLE_GUI=OFF \
+        -DCMAKE_AR=/usr/bin/llvm-ar \
+        -DCMAKE_RANLIB=/usr/bin/llvm-ranlib \
+    && cmake --build build \
+    && cmake --install build --prefix /usr/local \
+    && rm -rf /tmp/fex
+
+# ===========================
+# Stage 2: Runtime minimal
+# ===========================
+FROM debian:bookworm-slim
+
+# Runtime dependencies for FEX
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1-mesa-dev \
+    libfuse2 \
+    sudo \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy FEX from builder
+COPY --from=builder /usr/local /usr/local
+
+# เพิ่ม PATH
+ENV PATH="/usr/local/bin:${PATH}"
+
+# Set default shell is FEXBash
+CMD ["FEXBash"]

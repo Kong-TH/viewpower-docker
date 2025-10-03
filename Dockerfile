@@ -85,7 +85,7 @@ RUN mkdir /install
 WORKDIR /install
 COPY --from=builder /build/ViewPower_linux_x64_text.sh /install/ViewPower_linux_x64_text.sh
 
-RUN echo "o\n/opt/ViewPower\nn\nn\n" | ./ViewPower_linux_x64_text.sh
+RUN echo "o\n/opt/ViewPower\nn\nn\n" | FEXBash ./ViewPower_linux_x64_text.sh
 RUN rm ViewPower_linux_x64_text.sh
 
 WORKDIR /opt/ViewPower
