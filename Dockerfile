@@ -33,6 +33,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     clang-16 \
     lld-16 \
+    llvm-16 \
     ninja-build \
     python3 \
     python3-pip \
@@ -48,14 +49,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && update-alternatives --set clang++ /usr/bin/clang++-16
 
 # Build FEX-Emu from source
-ENV CC=/usr/bin/clang-16
-ENV CXX=/usr/bin/clang++-16
-ENV AR=/usr/bin/llvm-ar-16
-ENV RANLIB=/usr/bin/llvm-ranlib-16
+ENV CC=/usr/bin/clang-16 \
+    CXX=/usr/bin/clang++-16
 
 RUN git clone --recursive https://github.com/FEX-Emu/FEX.git /tmp/fex \
     && cd /tmp/fex \
-    && git fetch --all \
     && git checkout FEX-2509_1 \
     && git submodule update --init --recursive \
     && sed -i '/add_subdirectory.*Tools/d' Source/CMakeLists.txt \
@@ -66,12 +64,8 @@ RUN git clone --recursive https://github.com/FEX-Emu/FEX.git /tmp/fex \
         -DFEX_BUILD_TOOLS=OFF \
         -DFEX_OPTION_USE_QT=OFF \
         -DFEX_OPTION_ENABLE_GUI=OFF \
-        -DCMAKE_AR=/usr/bin/llvm-ar-16 \
-        -DCMAKE_RANLIB=/usr/bin/llvm-ranlib-16 \
-        -DCMAKE_C_COMPILER_AR=/usr/bin/llvm-ar-16 \
-        -DCMAKE_C_COMPILER_RANLIB=/usr/bin/llvm-ranlib-16 \
-        -DCMAKE_CXX_COMPILER_AR=/usr/bin/llvm-ar-16 \
-        -DCMAKE_CXX_COMPILER_RANLIB=/usr/bin/llvm-ranlib-16 . \
+        -DCMAKE_AR=/usr/bin/llvm-ar \
+        -DCMAKE_RANLIB=/usr/bin/llvm-ranlib \
     && cmake --build build \
     && cmake --install build --prefix /usr/local \
     && rm -rf /tmp/fex
@@ -102,7 +96,8 @@ RUN mkdir -p /opt/ViewPower/default_data && \
     cp -a /opt/ViewPower/log /opt/ViewPower/default_data/log
 
 # Clear uselass packages
-RUN apt-get purge -y build-essential clang-16 lld-16 cmake ninja-build git
+RUN apt-get purge -y build-essential clang-16 lld-16 cmake ninja-build git \
+    && apt-get autoremove -y && apt-get clean
 
 # ===========================
 # Add shutdown script
