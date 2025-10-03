@@ -67,7 +67,11 @@ RUN git clone --recursive https://github.com/FEX-Emu/FEX.git /tmp/fex \
         -DFEX_OPTION_USE_QT=OFF \
         -DFEX_OPTION_ENABLE_GUI=OFF \
         -DCMAKE_AR=/usr/bin/llvm-ar-16 \
-        -DCMAKE_RANLIB=/usr/bin/llvm-ranlib-16 . \
+        -DCMAKE_RANLIB=/usr/bin/llvm-ranlib-16 \
+        -DCMAKE_C_COMPILER_AR=/usr/bin/llvm-ar-16 \
+        -DCMAKE_C_COMPILER_RANLIB=/usr/bin/llvm-ranlib-16 \
+        -DCMAKE_CXX_COMPILER_AR=/usr/bin/llvm-ar-16 \
+        -DCMAKE_CXX_COMPILER_RANLIB=/usr/bin/llvm-ranlib-16 . \
     && cmake --build build \
     && cmake --install build --prefix /usr/local \
     && rm -rf /tmp/fex
