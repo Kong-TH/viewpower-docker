@@ -22,55 +22,7 @@ RUN rm ViewPower_linux_x64_text.tar.gz
 # ===========================
 # Runtime Stage (ARM64)
 # ===========================
-FROM debian:bookworm-slim as runtime
-
-# Install build dependencies for FEX-Emu
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    git \
-    binutils \
-    cmake \
-    build-essential \
-    clang-16 \
-    lld-16 \
-    llvm-16 \
-    ninja-build \
-    python3 \
-    python3-pip \
-    nasm \
-    pkg-config \
-    wget \
-    libgl1-mesa-dev \
-    libfuse2 \
-    && update-ca-certificates \
-    && update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 100 \
-    && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-16 100 \
-    && update-alternatives --set clang /usr/bin/clang-16 \
-    && update-alternatives --set clang++ /usr/bin/clang++-16 \
-    && ln -sf /usr/bin/llvm-ar-16 /usr/bin/llvm-ar \
-    && ln -sf /usr/bin/llvm-ranlib-16 /usr/bin/llvm-ranlib
-
-# Build FEX-Emu from source
-ENV CC=/usr/bin/clang-16 \
-    CXX=/usr/bin/clang++-16
-
-RUN git clone --recursive https://github.com/FEX-Emu/FEX.git /tmp/fex \
-    && cd /tmp/fex \
-    && git checkout FEX-2509_1 \
-    && git submodule update --init --recursive \
-    && sed -i '/add_subdirectory.*Tools/d' Source/CMakeLists.txt \
-    && cmake -B build -G Ninja \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DFEX_CORE=ON \
-        -DFEX_BUILD_TESTS=OFF \
-        -DFEX_BUILD_TOOLS=OFF \
-        -DFEX_OPTION_USE_QT=OFF \
-        -DFEX_OPTION_ENABLE_GUI=OFF \
-        -DCMAKE_AR=/usr/bin/llvm-ar \
-        -DCMAKE_RANLIB=/usr/bin/llvm-ranlib \
-    && cmake --build build \
-    && cmake --install build --prefix /usr/local \
-    && rm -rf /tmp/fex
+FROM fex-emu:latest as runtime
 
 # Install runtime dependencies (no Qt needed)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -96,10 +48,6 @@ RUN mkdir -p /opt/ViewPower/default_data && \
     cp -a /opt/ViewPower/datas /opt/ViewPower/default_data/datas && \
     cp -a /opt/ViewPower/datalog /opt/ViewPower/default_data/datalog && \
     cp -a /opt/ViewPower/log /opt/ViewPower/default_data/log
-
-# Clear uselass packages
-RUN apt-get purge -y build-essential clang-16 lld-16 cmake ninja-build git \
-    && apt-get autoremove -y && apt-get clean
 
 # ===========================
 # Add shutdown script

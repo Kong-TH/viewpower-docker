@@ -65,7 +65,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy FEX from builder
 COPY --from=builder /usr/local /usr/local
 
-# เพิ่ม PATH
+# Add PATH
 ENV PATH="/usr/local/bin:${PATH}"
 
 # Set default shell is FEXBash
