@@ -1,19 +1,13 @@
-# New update for ViewPower Version 1.04-25210-b1
-
 # ===========================
 # Build Stage
 # ===========================
-FROM ubuntu:latest AS builder
+# Use ARM64 Debian slim as base
+FROM --platform=linux/arm64 debian:bookworm-slim as builder
 
-# Install minimal dependencies for downloading ViewPower
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    wget \
-    tar \
-    && rm -rf /var/lib/apt/lists/* 
+# Install basic tools, wget and tar
+RUN apt update && apt install -y wget tar qemu-user-static binfmt-support && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y wget ca-certificates && rm -rf /var/lib/apt/lists/*
-
-# Download and extract ViewPower installer
+# Create build directory and download ViewPower installer
 RUN mkdir /build
 WORKDIR /build
 RUN wget -c https://www.power-software-download.com/viewpower/ViewPower_linux_x64_text.tar.gz
@@ -23,65 +17,50 @@ RUN rm ViewPower_linux_x64_text.tar.gz
 # ===========================
 # Runtime Stage
 # ===========================
-FROM ubuntu:latest
+# Use ARM64 Debian slim as runtime
+FROM --platform=linux/arm64 debian:bookworm-slim as runtime
 
-# ---------------------------
-# Install dependencies for FEX-Emu and ViewPower
-# ---------------------------
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    sudo \
-    curl \
-    libgl1-mesa-dev \
-    libfuse2 \
-    squashfs-tools \
-    zenity \
-    lib32z1 \
-    && rm -rf /var/lib/apt/lists/*
+# Install dependencies and QEMU for x86_64 emulation
+RUN apt update && \
+    apt install -y sudo lib32z1 curl qemu-user-static binfmt-support && \
+    rm -rf /var/lib/apt/lists/*
 
-# ---------------------------
-# Download and install FEX-Emu arm64 deb packages
-# ---------------------------
-RUN curl -L -o /tmp/fex-emu.deb \
-    "https://blueprints.launchpad.net/~fex-emu/+archive/ubuntu/fex/+build/31290640/+files/fex-emu-armv8.2_2509.1~q_arm64.deb" \
-    && curl -L -o /tmp/libfex-emu-dev.deb \
-    "https://blueprints.launchpad.net/~fex-emu/+archive/ubuntu/fex/+build/31290640/+files/libfex-emu-armv8.2-dev_2509.1~q_arm64.deb"
-
-# Install FEX-Emu
-RUN dpkg -i /tmp/libfex-emu-dev.deb /tmp/fex-emu.deb || apt-get install -y -f
-RUN rm /tmp/fex-emu.deb /tmp/libfex-emu-dev.deb
-
-# ---------------------------
-# Setup default RootFS for FEX-Emu
-# ---------------------------
-RUN mkdir -p /root/.fex-emu/RootFS
-RUN curl -L -o /root/.fex-emu/RootFS/Ubuntu_22_10.sqsh \
-    "https://rootfs.fex-emu.gg/Ubuntu_22_10/2023-05-19/Ubuntu_22_10.sqsh"
-ENV FEX_ROOTFS="/root/.fex-emu/RootFS/Ubuntu_22_10.sqsh"
-
-# ---------------------------
-# Copy ViewPower installer from build stage
-# ---------------------------
+# Create install directory
 RUN mkdir /install
 WORKDIR /install
+
+# Copy installer from build stage
 COPY --from=builder /build/ViewPower_linux_x64_text.sh /install/ViewPower_linux_x64_text.sh
 
-# ---------------------------
-# Install ViewPower using FEXBash
-# ---------------------------
-RUN echo "o\n/opt/ViewPower\nn\nn\n" | FEXBash ./ViewPower_linux_x64_text.sh
+# Make installer executable
+RUN chmod +x ./ViewPower_linux_x64_text.sh
+
+# Run installer automatically using QEMU (simulate x86_64 environment)
+RUN echo -e "o\n/opt/ViewPower\nn\nn\n" | ./ViewPower_linux_x64_text.sh
+
+# Remove installer to save space
 RUN rm ViewPower_linux_x64_text.sh
 
-# ---------------------------
-# Prepare default data and run initial upsMonitor
-# ---------------------------
+# Set working directory to installed ViewPower
 WORKDIR /opt/ViewPower
-RUN FEXBash ./upsMonitor start && sleep 60 && FEXBash ./upsMonitor stop
 
-RUN mkdir -p /opt/ViewPower/default_data \
-    && cp -a /opt/ViewPower/config /opt/ViewPower/default_data/config \
-    && cp -a /opt/ViewPower/datas /opt/ViewPower/default_data/datas \
-    && cp -a /opt/ViewPower/datalog /opt/ViewPower/default_data/datalog \
-    && cp -a /opt/ViewPower/log /opt/ViewPower/default_data/log
+# Make all binaries executable
+RUN find . -type f -name "*.sh" -exec chmod +x {} \;
+
+# Setup QEMU wrapper for all x86_64 binaries automatically
+# This allows running ViewPower binaries without prepending 'qemu-x86_64' each time
+ENV QEMU_LD_PREFIX=/usr/x86_64-linux-gnu
+COPY --from=builder /usr/bin/qemu-x86_64-static /usr/bin/
+
+# Start and stop upsMonitor using QEMU to initialize default data
+RUN qemu-x86_64 ./upsMonitor start && sleep 60 && qemu-x86_64 ./upsMonitor stop
+
+# Backup default configuration and data
+RUN mkdir -p /opt/ViewPower/default_data && \
+    cp -a /opt/ViewPower/config /opt/ViewPower/default_data/config && \
+    cp -a /opt/ViewPower/datas /opt/ViewPower/default_data/datas && \
+    cp -a /opt/ViewPower/datalog /opt/ViewPower/default_data/datalog && \
+    cp -a /opt/ViewPower/log /opt/ViewPower/default_data/log
 
 # ===========================
 # Add shutdown script
@@ -89,7 +68,7 @@ RUN mkdir -p /opt/ViewPower/default_data \
 COPY ./shutdown.sh /usr/local/bin/shutdown.sh
 RUN chmod +x /usr/local/bin/shutdown.sh
 
-# Set volume for trigger file
+# Set volume for trigger files
 VOLUME ["/ups-events"]
 
 # ===========================
@@ -97,10 +76,12 @@ VOLUME ["/ups-events"]
 # ===========================
 COPY ./entrypoint /opt/ViewPower/entrypoint
 RUN chmod +x /opt/ViewPower/entrypoint
-ENTRYPOINT ["./entrypoint"]
+# Use QEMU to run entrypoint automatically in x86_64 mode
+ENTRYPOINT ["qemu-x86_64", "./entrypoint"]
 
 # ===========================
 # Health Check
 # ===========================
+# Check if web server responds on default port
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
   CMD curl -sSf http://localhost:15178 || exit 1
