@@ -22,7 +22,7 @@ FROM --platform=linux/arm64 debian:bookworm-slim as runtime
 
 # Install dependencies and QEMU for x86_64 emulation
 RUN apt update && \
-    apt install -y sudo lib32z1 curl qemu-user-static binfmt-support && \
+    apt install -y sudo curl qemu-user-static binfmt-support && \
     rm -rf /var/lib/apt/lists/*
 
 # Create install directory
