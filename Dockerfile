@@ -34,26 +34,35 @@ RUN apt update && \
     apt install -y sudo curl qemu-user-static binfmt-support && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy pre-installed ViewPower from x86_64 builder
+# Copy from builder
 COPY --from=builder /opt/ViewPower /opt/ViewPower
 
-# Set working directory
 WORKDIR /opt/ViewPower
 
-# Copy entrypoint script
-COPY ./entrypoint /opt/ViewPower/entrypoint
-RUN chmod +x /opt/ViewPower/entrypoint
+# ---------------------------
+# Test execution
+# ---------------------------
+RUN ./upsMonitor start && sleep 60 && ./upsMonitor stop
 
-# Optional: copy shutdown script
+# Prepare default data
+RUN mkdir -p /opt/ViewPower/default_data && \
+    cp -a /opt/ViewPower/config /opt/ViewPower/default_data/config && \
+    cp -a /opt/ViewPower/datas /opt/ViewPower/default_data/datas && \
+    cp -a /opt/ViewPower/datalog /opt/ViewPower/default_data/datalog && \
+    cp -a /opt/ViewPower/log /opt/ViewPower/default_data/log
+
+# Add shutdown script
 COPY ./shutdown.sh /usr/local/bin/shutdown.sh
 RUN chmod +x /usr/local/bin/shutdown.sh
 
-# Set volume for trigger files
+# Volume for event trigger
 VOLUME ["/ups-events"]
 
-# Set container entrypoint
+# Add entrypoint
+COPY ./entrypoint /opt/ViewPower/entrypoint
+RUN chmod +x /opt/ViewPower/entrypoint
 ENTRYPOINT ["./entrypoint"]
 
-# Healthcheck (example)
+# Healthcheck
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
   CMD curl -sSf http://localhost:15178 || exit 1
