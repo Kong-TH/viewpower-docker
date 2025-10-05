@@ -14,10 +14,12 @@ RUN tar -xvzf ViewPower_linux_x64_text.tar.gz
 RUN rm ViewPower_linux_x64_text.tar.gz
 
 # Make installer executable
-RUN chmod +x ./ViewPower_linux_x64_text.sh \
+RUN chmod +x ./ViewPower_linux_x64_text.sh
+
+# Copy silent install config file
+COPY response.varfile /build/response.varfile
 
 # Run installer automatically (x86_64)
-COPY response.varfile /build/response.varfile
 RUN ./ViewPower_linux_x64_text.sh -q -varfile /build/response.varfile
 
 # Pre-installed ViewPower is now in /opt/ViewPower inside builder
