@@ -1,0 +1,8 @@
+# install4j response file
+sys.installationDir=/opt/ViewPower
+sys.languageId=en
+executeLauncherAction$Boolean=true
+createDesktopShortcut$Boolean=false
+createStartMenuShortcut$Boolean=false
+sys.component.0$Boolean=true
+sys.programGroupDisabled$Boolean=true
