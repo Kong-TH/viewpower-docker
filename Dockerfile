@@ -27,12 +27,14 @@ RUN ./ViewPower_linux_x64_text.sh -q -varfile /build/response.varfile
 # Runtime stage (ARM64)
 # ===========================
 # Use ARM64 Debian for runtime
-FROM --platform=linux/arm64 debian:bookworm-slim AS runtime
+FROM debian:bookworm-slim AS runtime
 
 # Install ARM64 dependencies + QEMU for possible x86 emulation
 RUN apt update && \
-    apt install -y sudo curl qemu-user-static binfmt-support && \
-    rm -rf /var/lib/apt/lists/*
+    apt install -y sudo curl qemu-user-static binfmt-support openjdk-17-jre && \
+    rm -rf /var/lib/apt/lists/* 
+
+ENV INSTALL4J_JAVA_HOME=/usr/lib/jvm/java-17-openjdk-arm64
 
 # Copy from builder
 COPY --from=builder /opt/ViewPower /opt/ViewPower
