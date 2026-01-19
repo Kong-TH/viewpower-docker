@@ -184,9 +184,9 @@ sudo systemctl enable --now ups-check.timer
 ```
 
 ## Source Code
-[📂 ViewPower Docker GitLab Repository](https://git.kohtnas.com/publicgroup/viewpower-docker)
+[📂 ViewPower Docker Github Repository](https://git.kohtnas.com/publicgroup/viewpower-docker)
 ```bash
-   git clone https://git.kohtnas.com/publicgroup/viewpower-docker.git
+   git clone https://github.com/Kong-TH/viewpower-docker.git
 ```
 ## Credit
 This Dockerfile is based on the original work from **[Michuu/viewpower-docker](https://github.com/Michuu/viewpower-docker)**, with modifications and improvements for better health checking and performance.
