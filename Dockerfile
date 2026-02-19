@@ -1,4 +1,4 @@
-#New update for ViewPower Version 1.04-25210-b1
+#New update for ViewPower Version 2.0-20363
 
 # ===========================
 # Build Stage
